@@ -15,6 +15,10 @@ function start_server () {
     sys.puts('server started');
 }
 
+function pass_along(data) {
+    if (data !== null) sys.print(data);
+}
+
 function restart_server () {
     // make sure we only send a kill signal once
     if(server != null) { 
@@ -25,14 +29,15 @@ function restart_server () {
 }
 
 function onServerExit(exitCode) {
-    sys.puts('Server process exited with code ' + exitCode);
+    if(exitCode) sys.puts('Server process exited with code ' + exitCode);
     start_server();
 }
 
-function pass_along(data){
-    if (data !== null) sys.print(data);
-}
-
+/**
+ * A recursive directory parser.
+ * Calls watch_file for each file it finds.
+ * Calls itself for each directory it finds.
+ */
 function parse_file_list (dir, files) {
 
     for (var i = 0; i < files.length; i++) {
@@ -46,12 +51,26 @@ function parse_file_list (dir, files) {
                         if(err) throw 'Could not read file ' + file + '. ' + err; 
                         parse_file_list(file_for_callback, files);
                     });
-                else if (stats.isFile())
-                    fs.watchFile(file_for_callback, restart_server);
+                else if (stats.isFile()) {
+                    watch_file(file_for_callback);
+                }
             });
         })();
     }
 
+}
+
+// wathes files whose filename does not include a '.' and restarts the server whenever they change
+function watch_file(file) {
+    if(!file.match(/.+\/\..+/)) {
+        sys.puts("  watching file: " + file);
+        fs.watchFile(file, function (curr, prev) {
+            if(curr.mtime != prev.mtime) { 
+                sys.puts('File changed: ' + JSON.stringify({ file:file, currmtime:curr.mtime, prevmtime:prev.mtime }));
+                restart_server();
+            }
+        });
+    }
 }
 
 fs.readdir(current_dir, function (err, files) {
