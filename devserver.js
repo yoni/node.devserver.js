@@ -44,7 +44,6 @@ function parse_file_list (dir, files) {
 
 }
 
-sys.puts(fs.readdir);
 fs.readdir(current_dir, function (err, files) {
     if(err) throw 'Could not load files in the current directory. ' + err;
     parse_file_list(current_dir, files);
