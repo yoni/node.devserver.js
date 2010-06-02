@@ -65,8 +65,7 @@ function watch_file(file) {
     if(!file.match(/.+\/\..+/)) {
         sys.puts("  watching file: " + file);
         fs.watchFile(file, function (curr, prev) {
-            if(curr.mtime != prev.mtime) { 
-                sys.puts('File changed: ' + JSON.stringify({ file:file, currmtime:curr.mtime, prevmtime:prev.mtime }));
+            if(new Date(curr.mtime).getTime() != new Date(prev.mtime).getTime()) { 
                 restart_server();
             }
         });
