@@ -10,8 +10,8 @@ current_dir = current_dir.slice(0, current_dir.length-1).join('/');
 function start_server () {
     server = spawn('node', [child_js_file]);
     server.addListener('exit', onServerExit);
-    server.addListener('output', pass_along);
-    server.addListener('error', pass_along);
+    server.stdout.addListener('data', pass_along);
+    server.stderr.addListener('data', pass_along);
     sys.puts('server started');
 }
 
