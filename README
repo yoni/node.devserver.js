@@ -1,7 +1,8 @@
-
-A relatively simple development webserver for node.js. It moniters the current 
+A relatively simple development webserver for node.js. It monitors the current 
 directory (recursively) for file changes, and restarts your node when it finds
 one.
+
+Ignores files and directories with a '.' in the path.
 
 Usage:
 node devserver.js myapp.js
